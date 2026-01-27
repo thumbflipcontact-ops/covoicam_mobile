@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "255675183611",
+    "project_id": "covoiturage-cameroon",
+    "storage_bucket": "covoiturage-cameroon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255675183611:android:d692864756b26f1583db5e",
+        "android_client_info": {
+          "package_name": "com.example.covoicam_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "255675183611-o8kj0iihpmlagi0s0766gfnep9aj66v8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-RasBt-BFUjxqd5UM6wb8u0qGFNUmCmc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255675183611-o8kj0iihpmlagi0s0766gfnep9aj66v8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "255675183611-hcjeb14n4isph88sfe9lga493njitp9m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.covoicamMobile"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
