@@ -8,8 +8,11 @@ workflows:
       xcode: latest
 
     scripts:
-      - name: Flutter version
-        script: flutter --version
+      # 🔍 ABSOLUTE PROOF — this must appear in logs
+      - name: VERIFY FLUTTER VERSION
+        script: |
+          which flutter
+          flutter --version
 
       - name: Flutter clean
         script: flutter clean
@@ -17,9 +20,12 @@ workflows:
       - name: Flutter pub get
         script: flutter pub get
 
-      - name: Set iOS deployment target
+      # 🛡 Safety: ensure iOS target is not pulled down by pods
+      - name: Enforce iOS deployment target
         script: |
-          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 10.0/IPHONEOS_DEPLOYMENT_TARGET = 12.0/g' ios/Runner.xcodeproj/project.pbxproj
+          if [ -f ios/Runner.xcodeproj/project.pbxproj ]; then
+            sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 10.0/IPHONEOS_DEPLOYMENT_TARGET = 12.0/g' ios/Runner.xcodeproj/project.pbxproj
+          fi
 
       - name: Build Android APK
         script: flutter build apk --release
