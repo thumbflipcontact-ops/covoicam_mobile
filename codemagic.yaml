@@ -1,17 +1,25 @@
 workflows:
-  android-ios-release:
+  android_ios_release:
     name: Android & iOS Release
     max_build_duration: 60
 
     environment:
-      flutter: 3.19.6
+      flutter: 3.16.9   # ← VERY IMPORTANT
+      xcode: latest
 
     scripts:
+      - name: Flutter version check
+        script: flutter --version
+
       - name: Flutter clean
         script: flutter clean
 
       - name: Flutter pub get
         script: flutter pub get
+
+      - name: Set iOS deployment target
+        script: |
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 10.0/IPHONEOS_DEPLOYMENT_TARGET = 12.0/g' ios/Runner.xcodeproj/project.pbxproj
 
       - name: Build Android APK
         script: flutter build apk --release
