@@ -5,8 +5,7 @@ workflows:
 
     environment:
       flutter: 3.24.1
-      xcode: 14.3.1
-
+      
     scripts:
       - name: Flutter version
         script: flutter --version
