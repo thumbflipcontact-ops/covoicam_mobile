@@ -1,21 +1,24 @@
 workflows:
-  android-release:
-    name: Android Release
+  android-ios-release:
+    name: Android & iOS Release
     max_build_duration: 60
 
     environment:
-      flutter: stable
+      flutter: 3.19.6
 
     scripts:
-      - name: Restore google-services.json
-        script: |
-          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > android/app/google-services.json
+      - name: Flutter clean
+        script: flutter clean
 
       - name: Flutter pub get
         script: flutter pub get
 
-      - name: Build APK
+      - name: Build Android APK
         script: flutter build apk --release
+
+      - name: Build iOS IPA
+        script: flutter build ipa --release
 
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
+      - build/ios/ipa/*.ipa
