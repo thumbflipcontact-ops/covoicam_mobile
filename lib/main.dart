@@ -7,7 +7,7 @@ import 'firebase_options.dart';
 import 'shared/require_login.dart';
 
 // Home screens by role
-import 'screens/driver/driver_home_screen.dart';
+import 'screens/drivers/driver_home_screen.dart';
 import 'screens/passenger/passenger_home_screen.dart';
 
 Future<void> main() async {

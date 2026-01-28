@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'trip_details_screen.dart';
+import 'ride_details_screen.dart';
 
 class BrowseRidesScreen extends StatelessWidget {
   const BrowseRidesScreen({super.key});
@@ -92,7 +92,7 @@ class BrowseRidesScreen extends StatelessWidget {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (_) => TripDetailsScreen(
+      builder: (_) => RideDetailsScreen(
         tripId: trip.id,
         tripData: data,
       ),
