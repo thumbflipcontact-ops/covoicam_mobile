@@ -3,10 +3,17 @@ plugins {
     // START: FlutterFire Configuration
     id("com.google.gms.google-services")
     // END: FlutterFire Configuration
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id("org.jetbrains.kotlin.android")
+    // Flutter Gradle Plugin (must be last)
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// ---- FIX: Read Flutter version values correctly (Kotlin DSL) ----
+val flutterVersionCode: Int =
+    project.findProperty("flutter.versionCode")?.toString()?.toInt() ?: 1
+
+val flutterVersionName: String =
+    project.findProperty("flutter.versionName")?.toString() ?: "1.0"
 
 android {
     namespace = "com.example.covoicam_mobile"
@@ -18,25 +25,26 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    // ---- FIX: modern Kotlin compiler options ----
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.covoicam_mobile"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+
+        // ---- FIXED ----
+        versionCode = flutterVersionCode
+        versionName = flutterVersionName
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
+            // For now, debug signing (Codemagic can still build)
             signingConfig = signingConfigs.getByName("debug")
         }
     }
