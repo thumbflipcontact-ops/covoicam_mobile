@@ -5,27 +5,17 @@ workflows:
 
     environment:
       flutter: 3.24.1
-      xcode: latest
+      xcode: 15.3
 
     scripts:
-      # 🔍 ABSOLUTE PROOF — this must appear in logs
-      - name: VERIFY FLUTTER VERSION
-        script: |
-          which flutter
-          flutter --version
+      - name: Flutter version
+        script: flutter --version
 
       - name: Flutter clean
         script: flutter clean
 
       - name: Flutter pub get
         script: flutter pub get
-
-      # 🛡 Safety: ensure iOS target is not pulled down by pods
-      - name: Enforce iOS deployment target
-        script: |
-          if [ -f ios/Runner.xcodeproj/project.pbxproj ]; then
-            sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 10.0/IPHONEOS_DEPLOYMENT_TARGET = 12.0/g' ios/Runner.xcodeproj/project.pbxproj
-          fi
 
       - name: Build Android APK
         script: flutter build apk --release
