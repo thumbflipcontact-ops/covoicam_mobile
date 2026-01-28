@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'role_selector.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -12,106 +14,84 @@ class _SignupScreenState extends State<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _isLoading = false;
+  UserRole _selectedRole = UserRole.passenger;
+  bool _loading = false;
   String? _error;
 
   Future<void> _signup() async {
     setState(() {
-      _isLoading = true;
+      _loading = true;
       _error = null;
     });
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      // 1. Create Firebase Auth user
+      final cred = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // User is automatically logged in → RequireLogin will handle redirect
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _error = e.message;
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
+      final uid = cred.user!.uid;
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+      // 2. Save role in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .set({
+        'email': _emailController.text.trim(),
+        'role': _selectedRole == UserRole.driver
+            ? 'driver'
+            : 'passenger',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+    } on FirebaseAuthException catch (e) {
+      setState(() => _error = e.message);
+    } finally {
+      setState(() => _loading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Créer un compte')),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Inscription',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF7C3AED),
-                ),
-              ),
-              const SizedBox(height: 32),
+      appBar: AppBar(title: const Text('Create account')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+            ),
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(labelText: 'Password'),
+              obscureText: true,
+            ),
 
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Mot de passe',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 24),
+            RoleSelector(
+              selectedRole: _selectedRole,
+              onChanged: (role) {
+                setState(() => _selectedRole = role);
+              },
+            ),
 
-              if (_error != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    _error!,
-                    style: const TextStyle(color: Colors.red),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+            if (_error != null)
+              Text(_error!, style: const TextStyle(color: Colors.red)),
 
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _signup,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7C3AED),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Créer mon compte'),
-                ),
-              ),
-            ],
-          ),
+            const SizedBox(height: 16),
+
+            ElevatedButton(
+              onPressed: _loading ? null : _signup,
+              child: _loading
+                  ? const CircularProgressIndicator()
+                  : const Text('Sign up'),
+            ),
+          ],
         ),
       ),
     );

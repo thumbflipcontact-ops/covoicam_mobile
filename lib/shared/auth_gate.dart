@@ -3,23 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../auth/login_screen.dart';
+import '../screens/driver/driver_home_screen.dart';
+import '../screens/passenger/passenger_home_screen.dart';
 
-class RequireLogin extends StatelessWidget {
-  final Widget driverChild;
-  final Widget passengerChild;
-
-  const RequireLogin({
-    super.key,
-    required this.driverChild,
-    required this.passengerChild,
-  });
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnapshot) {
-        // ⏳ Waiting for Firebase Auth
+        // 🔄 Loading auth state
         if (authSnapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -40,35 +35,25 @@ class RequireLogin extends StatelessWidget {
               .doc(uid)
               .get(),
           builder: (context, userSnapshot) {
-            // ⏳ Waiting for Firestore
             if (userSnapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               );
             }
 
-            // ❌ User document missing
             if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
               return const Scaffold(
-                body: Center(
-                  child: Text(
-                    'User profile not found',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
+                body: Center(child: Text('User record not found')),
               );
             }
 
-            final data = userSnapshot.data!.data() as Map<String, dynamic>;
-            final role = data['role'];
+            final role = userSnapshot.data!['role'];
 
-            // 🚗 Driver
             if (role == 'driver') {
-              return driverChild;
+              return const DriverHomeScreen();
+            } else {
+              return const PassengerHomeScreen();
             }
-
-            // 🧍 Passenger (default)
-            return passengerChild;
           },
         );
       },
